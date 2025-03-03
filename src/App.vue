@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import PagePrincipale from './views/PagePrincipale.vue'
 </script>
 
 <template>
@@ -8,7 +9,7 @@ import { RouterLink, RouterView } from 'vue-router'
       <nav></nav>
     </div>
   </header>
-
+  <PagePrincipale />
   <RouterView />
 </template>
 

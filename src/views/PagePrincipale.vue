@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import DemPlateau from '@/components/DemPlateau.vue'
+
+// 10x8 et 10mines / 18x14 et 40 mines / 24x20 et 99 mines
 const difficult = ['Facile', 'Moyen', 'Difficile']
 
 const bouton = ref(false)
