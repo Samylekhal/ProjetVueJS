@@ -9,7 +9,6 @@ import PagePrincipale from './views/PagePrincipale.vue'
       <nav></nav>
     </div>
   </header>
-  <PagePrincipale />
   <RouterView />
 </template>
 
