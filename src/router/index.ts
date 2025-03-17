@@ -3,21 +3,13 @@ import PagePrincipale from '../views/PagePrincipale.vue'
 import Jeu from '../views/JeuDem.vue'
 
 const routes = [
-  {
-    path: '/',
-    name: 'PagePrincipale',
-    component: PagePrincipale,
-  },
-  {
-    path: '/jeu/:level',
-    name: 'jeu',
-    component: Jeu,
-  },
+  { path: '/', component: PagePrincipale },
+  { path: '/jeu/:level', name: 'jeu', component: Jeu } // Définition de la page de jeu
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 })
 
 export default router
