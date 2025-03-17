@@ -1,4 +1,18 @@
 {
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "lib": ["esnext", "dom"]
+  },
   "files": [],
   "references": [
     {
@@ -10,5 +24,6 @@
     {
       "path": "./tsconfig.vitest.json"
     }
+    
   ]
 }

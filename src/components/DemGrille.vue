@@ -1,61 +1,108 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import DemCase from './DemCase.vue'
+
+// Définition des props
+const props = defineProps<{
+  rows: number
+  cols: number
+  minesCount: number
+}>()
+
+// Interface pour une case
+interface CaseType {
+  x: number
+  y: number
+  isMine: boolean
+  isRevealed: boolean
+  isFlagged: boolean
+  minesAround: number
+}
+
+// Initialisation de la grille vide
+const grid = ref<CaseType[][]>([])
+
+const initGrid = () => {
+  grid.value = Array.from({ length: props.rows }, (_, y) =>
+    Array.from({ length: props.cols }, (_, x) => ({
+      x,
+      y,
+      isMine: false,
+      isRevealed: false,
+      isFlagged: false,
+      minesAround: 0
+    }))
+  )
+} 
+
+// Fonction pour révéler une case
+const revealCase = (x: number, y: number) => {
+  const cell = grid.value[y][x]
+  if (!cell.isRevealed) {
+    cell.isRevealed = true
+  }
+}
+
+// Fonction pour poser/enlever un drapeau
+const flagCase = (x: number, y: number) => {
+  const cell = grid.value[y][x]
+  if (!cell.isRevealed) {
+    cell.isFlagged = !cell.isFlagged
+  }
+}
+
+
+
+onMounted(() => {
+  initGrid();
+});
+
+</script>
+
 <template>
-  <div>
-    <DemTimer ref="timer" />
-    <div class="grid">
-      <DemCase 
-        v-for="(cell, index) in grid" 
-        :key="index"
-        :mine="cell.mine" 
-        :adjacentMines="cell.adjacentMines" 
-      />
-    </div>
+  <div class="grid" >
+    <div v-for="(row, y) in grid" :key="y" class="row">
+    <DemCase
+      v-for="(cell, x) in row"
+      :key="x"
+      :mine="cell.isMine"
+      :adjacentMines="cell.minesAround"
+      @click="() => revealCase(cell.x, cell.y)"
+      @contextmenu.prevent="() => flagCase(cell.x, cell.y)"
+
+    />
+  </div>
   </div>
 </template>
 
-<script>
-import DemTimer from './DemTimer.vue';
-import DemCase from './DemCase.vue';
+<style scoped>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 30px); /* Nombre de colonnes dynamiques */
+  margin: 0 auto;
+}
 
-export default {
-  components: { DemTimer, DemCase },
-  props: {
-    rows: { type: Number, required: true },
-    cols: { type: Number, required: true },
-    mines: { type: Number, required: true }
-  },
-  data() {
-    return { grid: this.generateGrid(this.rows, this.cols, this.mines) };
-  },
-  methods: {
-    generateGrid(rows, cols, mines) {
-      let grid = Array.from({ length: rows * cols }, () => ({ mine: false, adjacentMines: 0 }));
+.row {
+  display: grid;
+  grid-template-columns: repeat(100%, 1fr); /* Un seul élément par ligne */
+}
 
-      // Place mines randomly
-      for (let i = 0; i < mines; i++) {
-        let index;
-        do { index = Math.floor(Math.random() * grid.length); }
-        while (grid[index].mine);
-        grid[index].mine = true;
-      }
+.case {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #b1dd9a;
+  background-color: #1a1818;
+  color: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-      // Calculate adjacent mines
-      grid.forEach((cell, i) => {
-        if (!cell.mine) {
-          let adjacent = [i - cols - 1, i - cols, i - cols + 1, i - 1, i + 1, i + cols - 1, i + cols, i + cols + 1]
-            .filter(idx => grid[idx] && !grid[idx].mine).length;
-          cell.adjacentMines = adjacent;
-        }
-      });
+.revealed {
+  background-color: #b1dd9a;
+}
 
-      return grid;
-    }
-  }
-};
-</script>
-
-<style>
-.grid { 
-  display: grid; 
-  grid-template-columns: repeat(v-bind(cols), 30px); /* Ajuste dynamiquement les colonnes */
+.flagged {
+  background-color: #1a1818;
 }
 </style>

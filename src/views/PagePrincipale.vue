@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+
 const router = useRouter()
 
 const startGame = (level: number) => {
@@ -17,6 +18,8 @@ const startGame = (level: number) => {
     <button @click="startGame(1)">Facile</button>
     <button @click="startGame(2)">Moyen</button>
     <button @click="startGame(3)">Difficile</button>
+
+    
   </div>
 </template>
 
