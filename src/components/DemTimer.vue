@@ -1,42 +1,51 @@
-<template>
-  <div class="timer">⏳ {{ time }}s</div>
-</template>
-
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch } from 'vue'
 
-const time = ref(0);
-let timer: NodeJS.Timeout;
+const props = defineProps<{
+  isRunning: boolean
+  hasLost: boolean
+  hasWon: boolean
+}>()
 
-// Démarrer le timer lorsque l'événement 'start-timer' est émis
+const time = ref(0)
+let timer: ReturnType<typeof setInterval> | null = null
+
+
+// Fonction pour démarrer le timer
 const startTimer = () => {
   if (!timer) {
-    timer = setInterval(() => time.value++, 1000);
+    timer = setInterval(() => {
+      time.value++
+    }, 1000)
   }
-};
+}
 
-// Arrêter le timer
+// Fonction pour arrêter le timer
 const stopTimer = () => {
   if (timer) {
-    clearInterval(timer);
-    timer = null;
+    clearInterval(timer)
+    timer = null
   }
-};
+}
 
-// Réinitialiser le timer
-const reset = () => {
-  stopTimer();
-  time.value = 0;
-};
+// Surveille les changements d'état du jeu
+watch(() => props.isRunning, (newVal) => {
+  if (newVal) {
+    startTimer()
+  }
+})
 
-// Écouter l'événement 'start-timer'
-onMounted(() => {
-  window.addEventListener('start-timer', startTimer);
-  window.addEventListener('reset-timer', reset);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('start-timer', startTimer);
-  window.removeEventListener('reset-timer', reset);
-});
+watch(() => [props.hasLost, props.hasWon], ([lost, won]) => {
+  if (lost || won) {
+    stopTimer()
+  }
+})
 </script>
+
+<template>
+  <div class="timer">
+    ⏳ Temps écoulé : {{ time }}s
+  </div>
+</template>
+
+

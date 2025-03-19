@@ -8,7 +8,7 @@ const props = defineProps<{
   adjacentMines: number
 }>()
 
-// États internes (équivalent de `data()`)
+// États des cases par défaut
 const revealed = ref(false)
 const flagged = ref(false)
 
@@ -25,9 +25,11 @@ const flag = () => {
   }
 }
 
+
 </script>
 
 <template>
+  <!-- Un clique gauche révèle la case, un clique droit pose un drapeau -->
   <button class="case" @click="reveal" @contextmenu.prevent="flag" :class="{ revealed, flagged }">
     {{ revealed ? (mine ? '💣' : adjacentMines || '') : (flagged ? '🚩' : '') }}
   </button>
