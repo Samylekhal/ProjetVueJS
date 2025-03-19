@@ -117,11 +117,7 @@ const filteredScores = computed(() => {
 </template>
 
 <style>
-.title {
-  font-size: 2rem;
-  background-color: #333;
-  color: white;
-}
+
 
 table {
   width: 100%;

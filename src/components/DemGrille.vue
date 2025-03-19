@@ -215,8 +215,9 @@ const checkWin = () => {
 
     // Valider le score
     addScoreToFirestore(pseudo, score, difficulte, formattedDate);
-
     alert("Bravo, vous avez gagné !");
+
+    router.push('/');
   }
 };
 

@@ -16,9 +16,12 @@ Difficulté réglable : Niveaux de difficulté ajustables (facile, moyen, diffic
 Indicateurs visuels : Affichage des mines restantes et du temps écoulé
 
 ## Difficultés rencontré 
-Plusieurs difficultés on été rencontré durant le developpement que ça soit par exemple le simple fait de comment faire un démineur dans un premier temps ou alors comment 
-s'assurer que la première case cliqué soit forcément vide. Sans compté aussi l'apprentissage de firebase et comment enregistré et utiliser les données de la base de données. 
+Plusieurs difficultés ont été rencontrées durant le développement que ça soit par exemple le simple fait de comment faire un démineur dans un premier temps ou alors comment s'assurer que la première case cliquée soit forcément vide. Sans compter aussi l'apprentissage de firebase et comment enregistrer et utiliser les données de la base de données. 
 
+La conception du démineur et de l'utilisation de firebase a pu être réalisé en s'inspirant de certains codes et tutoriel permettant d'en faire un en javascript ce qui aura permis de scinder le jeu en trois composant un pour une case du jeu, un pour la grille et un autre pour le timer. Pour s'assurer que la grille commence toujours par une case vide, l'idée a été de faire en sorte que les mines soit placé en premier après que le joueur ait cliqué sur la première case, les mines sont répartis aléatoirement dans les cases de la grille à l'exception de celle sur laquelle le joueur à cliqué et ses cases adjacentes. 
+
+
+Certaines fonctionalités n'ont malheureusement pas pu être finalisé par manque de temps comme l'idée de l'ajout d'un niveau personalisé ou encore le décochage automatique des cases vides.
 
 ## Installation
 
