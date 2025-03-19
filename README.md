@@ -26,12 +26,26 @@ s'assurer que la première case cliqué soit forcément vide. Sans compté aussi
 Extraire le fichier .zip reçu ou cloner le depot github du projet avec la commade suivante:
 
 ```sh
-git clone 
+git clone https://github.com/Samylekhal/ProjetVueJS.git
 ```
-
 
 ### Installer les dépendances
 ```sh
 npm install
 ```
 
+### Configurer Firebase
+
+Créer un projet de base de données avec firebase
+
+- Dans régles modifié la 6 ligne du code présent "allow read, write: if false;" 
+en remplaçant "false" par "true"
+
+- Allez dans le fichier firebase.js présent dans le dossier src 
+et remplacé les variables présentes dans firebaseConfig par celle de votre database.
+Vous les trouverez dans les paramètres généraux de votre base de données en descendant la page.
+
+
+### Lancer le site
+
+Utiliser la commande "npm run dev" et cliquer sur le lien localhost vous avez désormais accès au site !
