@@ -11,10 +11,12 @@
 import { ref, computed } from "vue";
 import { auth } from '../../firebase'
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useDataScoreStore } from "@/stores/firebaseStore";
 
+
+const dataScoreStore = useDataScoreStore();
 const email = ref("");
 const password = ref("");
-console.log(auth.currentUser.displayName);
 
 
 const isFormValid = computed(() => email.value !== "" && password.value.length >= 6);
@@ -27,6 +29,9 @@ if (!isFormValid.value) {
  try {
     await signInWithEmailAndPassword(auth, email.value, password.value);
     alert("Connexion réussie !");
+    dataScoreStore.setPseudo(auth.currentUser.displayName);    
+    console.log(auth.currentUser.displayName);
+
 } catch (error) {
     alert(error.message);
 }

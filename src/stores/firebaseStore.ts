@@ -1,51 +1,44 @@
 import { defineStore } from 'pinia';
-import { db, auth, collection, addDoc, getDocs, query, orderBy, limit } from '../firebase';
 import { ref } from 'vue';
 
-export const useFirebaseStore = defineStore('firebase', () => {
-  const scores = ref([]); // Stocker les scores récupérés
-  const currentUser = ref(auth.currentUser); // Stocker l'utilisateur actuel
+export const useDataScoreStore = defineStore('DataScore', () => {
 
-  // Fonction pour récupérer les scores depuis Firestore
-  const fetchScores = async () => {
-    try {
-      const scoresCollection = collection(db, 'scores');
-      const scoresQuery = query(scoresCollection, orderBy('score', 'desc'), limit(10));
-      const querySnapshot = await getDocs(scoresQuery);
-      scores.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Erreur lors de la récupération des scores :', error);
-    }
-  };
+  // State
+  const pseudo = ref('');
+  const score = ref(0);
+  const date = ref('');
+  const difficile = ref('');
 
-  // Fonction pour ajouter un score dans Firestore
-  const addScore = async (score: number, difficulty: string) => {
-    try {
-      const scoresCollection = collection(db, 'scores');
-      await addDoc(scoresCollection, {
-        score, // Temps réalisé
-        user: currentUser.value?.email || 'Anonyme', // Adresse e-mail
-        timestamp: new Date(), // Date de fin de partie
-        difficulty, // Niveau de difficulté (facile, normal, difficile)
-      });
-      await fetchScores(); // Mettre à jour les scores après ajout
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout du score :', error);
-    }
-  };
+  // Getters
+  const getPseudo = () => pseudo.value;
+  const getScore = () => score.value;
+  const getDate = () => date.value;
+  const getDifficile = () => difficile.value;
 
-  // Fonction pour surveiller l'utilisateur connecté
-  const watchAuthState = () => {
-    auth.onAuthStateChanged(user => {
-      currentUser.value = user;
-    });
-  };
+  // Actions
+  const setPseudo = (value: string) => pseudo.value = value;
+  const setScore = (value: number) => score.value = value;  
+  const setDate = (value: string) => date.value = value;
+  const setDifficile = (value: string) => difficile.value = value;
 
+  const removeallData = async () => {
+    pseudo.value = '';
+    score.value = 0;
+    date.value = '';
+    difficile.value = '';
+  }
+
+  // retourner les fonctions et datas
   return {
-    scores,
-    currentUser,
-    fetchScores,
-    addScore,
-    watchAuthState,
-  };
+    getPseudo,
+    getScore,
+    getDate,
+    getDifficile,
+    setPseudo,
+    setScore,
+    setDate,
+    setDifficile,
+    removeallData
+  }
+
 });

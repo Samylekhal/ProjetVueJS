@@ -1,64 +1,37 @@
-# ProjetVueJS
+# ProjetVueJS Samy Lekhal : Demineur
 
-This template should help get you started developing with Vue 3 in Vite.
+Le projet de démineur est une implémentation du jeu du démineur programmer via Vue.js et Firebase pour la gestion des scores. 
 
-## Recommended IDE Setup
+## Objectif du Projet
+Ce projet visait à recréer le jeu classique de démineur avec une interface des fonctionnalités supplémentaires telles que la gestion des scores et l'authentification des utilisateurs. Le but est de permettre aux joueurs de s'affronter en enregistrant leurs meilleurs scores dans une base de données Firebase.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-## Type Support for `.vue` Imports in TS
+## Fonctionnalités Principales
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+Interface utilisateur : Grille de jeu interactive avec des cases cliquables.
+Gestion des scores : Enregistrement des scores des joueurs dans Firebase.
+Authentification : Connexion des utilisateurs via Firebase Authentication.
+Timer : Chronomètre pour mesurer le temps de jeu.
+Difficulté réglable : Niveaux de difficulté ajustables (facile, moyen, difficile).
+Indicateurs visuels : Affichage des mines restantes et du temps écoulé
 
-## Customize configuration
+## Difficultés rencontré 
+Plusieurs difficultés on été rencontré durant le developpement que ça soit par exemple le simple fait de comment faire un démineur dans un premier temps ou alors comment 
+s'assurer que la première case cliqué soit forcément vide. Sans compté aussi l'apprentissage de firebase et comment enregistré et utiliser les données de la base de données. 
 
-See [Vite Configuration Reference](https://vite.dev/config/).
 
-## Project Setup
+## Installation
 
+### Récupérer le code
+Extraire le fichier .zip reçu ou cloner le depot github du projet avec la commade suivante:
+
+```sh
+git clone 
+```
+
+
+### Installer les dépendances
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Run End-to-End Tests with [Playwright](https://playwright.dev)
-
-```sh
-# Install browsers for the first run
-npx playwright install
-
-# When testing on CI, must build the project first
-npm run build
-
-# Runs the end-to-end tests
-npm run test:e2e
-# Runs the tests only on Chromium
-npm run test:e2e -- --project=chromium
-# Runs the tests of a specific file
-npm run test:e2e -- tests/example.spec.ts
-# Runs the tests in debug mode
-npm run test:e2e -- --debug
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```

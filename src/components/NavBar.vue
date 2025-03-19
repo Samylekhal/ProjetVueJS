@@ -13,18 +13,25 @@
    import { ref, onMounted } from "vue";
    import { auth } from "../firebase";
    import { signOut } from "firebase/auth"; 
+   import { useDataScoreStore } from "@/stores/firebaseStore"; 
+
+   const dataScoreStore = useDataScoreStore(); 
 
    const isAuthenticated = ref(false);
    // Vérifier si l'utilisateur est connecté
    onMounted(() => {
     isAuthenticated.value = !!auth.currentUser;
+
+
+
    });
 
    // Fonction de déconnexion
 const logout = async () =>{
- await signOut(auth);
- isAuthenticated.value = false;
- alert("Déconnecté !");
+    await signOut(auth);   
+    dataScoreStore.removeallData();
+    isAuthenticated.value = false;
+    alert("Déconnecté !");
 };
 </script>
 

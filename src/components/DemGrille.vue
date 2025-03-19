@@ -1,45 +1,77 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import DemCase from './DemCase.vue'
+import { ref, onMounted } from 'vue';
+import DemCase from './DemCase.vue';
 import DemTimer from './DemTimer.vue';
-import { nextTick } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import { useDataScoreStore } from '@/stores/firebaseStore';
+import { db, auth } from '@/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
+// Fonction pour ajouter un score dans Firestore
+async function addScoreToFirestore(pseudo, temps, difficulte, date) {
+  try {
+    const scoresCollection = collection(db, "scores"); // Collection "scores"
+    await addDoc(scoresCollection, {
+      pseudo: pseudo,
+      temps: temps,
+      difficulte: difficulte,
+      date: date,
+    });
+    console.log("Score ajouté avec succès !");
+  } catch (error) {
+    console.error("Erreur lors de l'ajout du score :", error);
+  }
+}
+
+const dataScoreStore = useDataScoreStore();
+const difficultes = ["facile", "moyen", "difficile"];
+
+const route = useRoute();
+const levelId = ref(Number(route.params.level));
+
+const difficulte = difficultes[levelId.value - 1];
+dataScoreStore.setDifficile(difficulte);
+
+if (auth.currentUser) {
+  dataScoreStore.setPseudo(auth.currentUser.displayName);
+} else {
+  dataScoreStore.setPseudo("Anonyme");
+}
 
 const props = defineProps<{
-  rows: number
-  cols: number
-  minesCount: number
-}>()
+  rows: number;
+  cols: number;
+  minesCount: number;
+}>();
 
 interface CaseType {
-  x: number
-  y: number
-  isMine: boolean
-  isRevealed: boolean
-  isFlagged: boolean
-  minesAround: number
+  x: number;
+  y: number;
+  isMine: boolean;
+  isRevealed: boolean;
+  isFlagged: boolean;
+  minesAround: number;
 }
 
 // Grille de jeu
-const grid = ref<CaseType[][]>([])
-const router = useRouter()
+const grid = ref<CaseType[][]>([]);
+const router = useRouter();
 // Compteur de drapeaux
-const flagsLeft = ref(props.minesCount) 
+const flagsLeft = ref(props.minesCount);
 // configure le timer
-const isRunning = ref(false)
-const hasLost = ref(false)
-const hasWon = ref(false)
+const isRunning = ref(false);
+const hasLost = ref(false);
+const hasWon = ref(false);
 
 // Fonction d'initialisation de la grille vide
 const initGrid = () => {
-  grid.value = Array.from({ length: props.rows }, (_, y) => 
+  grid.value = Array.from({ length: props.rows }, (_, y) =>
     Array.from({ length: props.cols }, (_, x) => ({
       x, y, isMine: false, isRevealed: false, isFlagged: false, minesAround: 0
     }))
-  )
-  flagsLeft.value = props.minesCount // Réinitialisation des drapeaux
-}
+  );
+  flagsLeft.value = props.minesCount; // Réinitialisation des drapeaux
+};
 
 // Retourne les cases adjacentes d'une position (x, y)
 const getAdjacentCells = (x: number, y: number) => {
@@ -48,136 +80,151 @@ const getAdjacentCells = (x: number, y: number) => {
     { x: -1, y: 0 },                   { x: 1, y: 0 },
     { x: -1, y: 1 }, { x: 0, y: 1 }, { x: 1, y: 1 }
   ].map(({ x: dx, y: dy }) => {
-    const nx = x + dx, ny = y + dy
-    return (nx >= 0 && nx < props.cols && ny >= 0 && ny < props.rows) ? grid.value[ny][nx] : null
-  }).filter(cell => cell !== null) as CaseType[]
-}
-
+    const nx = x + dx, ny = y + dy;
+    return (nx >= 0 && nx < props.cols && ny >= 0 && ny < props.rows) ? grid.value[ny][nx] : null;
+  }).filter(cell => cell !== null) as CaseType[];
+};
 
 // Placement des mines après le premier clic
 const placeMines = (firstX: number, firstY: number) => {
-  let placedMines = 0
-
+  let placedMines = 0;
 
   while (placedMines < props.minesCount) {
     // choisi une position aléatoire
-    const x = Math.floor(Math.random() * props.cols)
-    const y = Math.floor(Math.random() * props.rows)
+    const x = Math.floor(Math.random() * props.cols);
+    const y = Math.floor(Math.random() * props.rows);
 
     // Si la case n'est pas déjà une mine et n'est pas adjacente à la première case cliquée
     if (!grid.value[y][x].isMine && !(Math.abs(x - firstX) <= 1 && Math.abs(y - firstY) <= 1)) {
-      grid.value[y][x].isMine = true
-      placedMines++
+      grid.value[y][x].isMine = true;
+      placedMines++;
     }
   }
   // Calculer le nombre de mines autour de chaque case
   grid.value.forEach((row, y) => {
     row.forEach((cell, x) => {
       if (!cell.isMine) {
-        cell.minesAround = getAdjacentCells(x, y).filter(c => c.isMine).length
+        cell.minesAround = getAdjacentCells(x, y).filter(c => c.isMine).length;
       }
-    })
-  })
-}
-
+    });
+  });
+};
 
 // Fonction pour révéler une case
 const revealCase = async (x: number, y: number) => {
-  const cell = grid.value[y][x]
+  const cell = grid.value[y][x];
 
   if (!isRunning.value) {
-    isRunning.value = true
+    isRunning.value = true;
   }
 
   if (cell.isMine) {
-    hasLost.value = true
-    isRunning.value = false
+    hasLost.value = true;
+    isRunning.value = false;
   }
 
   // Si c'est le premier clic, placer les mines
   if (grid.value.flat().every(c => !c.isRevealed)) {
-    cell.isRevealed = true
-    placeMines(x, y)
-    
-    revealAdjacentCells(x, y)
+    cell.isRevealed = true;
+    placeMines(x, y);
+
+    revealAdjacentCells(x, y);
     // Attendre que Vue mette à jour la grille
-    await nextTick()
-    grid.value = grid.value.map(row => row.map(cell => ({ ...cell })))
+    grid.value = grid.value.map(row => row.map(cell => ({ ...cell })));
 
-    return
-
+    return;
   }
 
-  if (cell.isRevealed || cell.isFlagged) return
+  if (cell.isRevealed || cell.isFlagged) return;
 
-  cell.isRevealed = true
-
+  cell.isRevealed = true;
 
   if (cell.isMine) {
     grid.value.forEach(row => {
       row.forEach(cell => {
-        if (cell.isMine) cell.isRevealed = true
-      })
-    })
-    router.push('/')
-    alert("Perdu !")
-    return
+        if (cell.isMine) cell.isRevealed = true;
+      });
+    });
+    router.push('/');
+    alert("Perdu !");
+    return;
   }
 
   // Révéler les cases adjacentes
   if (cell.minesAround === 0) {
-    revealAdjacentCells(x, y)
+    revealAdjacentCells(x, y);
   }
 
-  checkWin()
-}
+  checkWin();
+};
 
 // Révélation récursive des cases adjacentes
 const revealAdjacentCells = (x: number, y: number) => {
   getAdjacentCells(x, y).forEach(adjCell => {
     if (!adjCell.isRevealed && !adjCell.isMine) {
-      adjCell.isRevealed = true
+      adjCell.isRevealed = true;
       if (adjCell.minesAround === 0) {
-        revealAdjacentCells(adjCell.x, adjCell.y)
+        revealAdjacentCells(adjCell.x, adjCell.y);
       }
-      console.log(adjCell.isRevealed)
     }
-  })
-}
+  });
+};
 
 // Fonction pour poser/enlever un drapeau
 const flagCase = (x: number, y: number) => {
-  const cell = grid.value[y][x]
+  const cell = grid.value[y][x];
 
   if (!cell.isRevealed) {
     if (!cell.isFlagged) {
       if (flagsLeft.value === 0) {
-        console.log("Plus de drapeaux disponibles")
-        return
+        return;
       } else {
-        cell.isFlagged = true
-        flagsLeft.value--
+        cell.isFlagged = true;
+        flagsLeft.value--;
       }
     } else {
-      cell.isFlagged = false
-      flagsLeft.value++
+      cell.isFlagged = false;
+      flagsLeft.value++;
     }
   }
-}
+};
 
 const checkWin = () => {
-  if (grid.value.flat().every(cell => cell.isRevealed || cell.isMine)) {
-    hasWon.value = true
-    isRunning.value = false
-    alert("Bravo, vous avez gagné !")
-  }
-}
+  console.log("Vérification de la victoire...");
+  const allRevealedOrMines = grid.value.flat().every(cell => cell.isRevealed || cell.isMine);
+  console.log("Toutes les cases révélées ou mines :", allRevealedOrMines);
 
+  if (allRevealedOrMines) {
+    hasWon.value = true;
+    isRunning.value = false;
+
+    // Récupérer la date actuelle en string
+    const date = new Date().toLocaleString();
+    dataScoreStore.setDate(date);
+
+    // Récupérer les valeurs des getters
+    const pseudo = dataScoreStore.getPseudo();
+    const score = dataScoreStore.getScore();
+    const difficulte = dataScoreStore.getDifficile();
+    const formattedDate = dataScoreStore.getDate();
+
+    console.log("Pseudo :", pseudo);
+    console.log("Score :", score);
+    console.log("Difficulté :", difficulte);
+    console.log("Date :", formattedDate);
+
+    // Valider le score
+    addScoreToFirestore(pseudo, score, difficulte, formattedDate);
+
+    alert("Bravo, vous avez gagné !");
+  }
+};
 
 onMounted(() => {
-  initGrid()
-})
+  initGrid();
+});
 </script>
+
 <template>
   <div class="game-container">
     <div class="header">
@@ -250,7 +297,6 @@ onMounted(() => {
 .revealed {
   background-color: #b1dd9a;
 }
-
 
 .grid {
   grid-template-columns: repeat(v-bind(cols), 25px);

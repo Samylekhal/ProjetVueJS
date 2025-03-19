@@ -2,6 +2,9 @@
    import { ref, computed } from "vue";
    import { auth } from '../../firebase'
    import { createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
+   import { useDataScoreStore } from "@/stores/firebaseStore";
+
+   const dataScoreStore = useDataScoreStore();
    
    const displayName = ref("");
    const email = ref("");
@@ -22,7 +25,7 @@
       // Utilisez updateProfile pour mettre à jour le profil de l'utilisateur
       await updateProfile(user, { displayName: displayName.value });
     }
-
+    dataScoreStore.setPseudo(displayName.value);
     alert("Compte créé avec succès !");
   } catch (error) {
     alert(error.message);
